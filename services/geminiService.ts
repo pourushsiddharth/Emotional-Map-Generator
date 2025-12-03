@@ -1,4 +1,5 @@
-import { GoogleGenAI, Schema, Type } from "@google/genai";
+
+import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { EmotionalMapAnalysis, UserInput } from "../types";
 
 const analysisSchema: Schema = {
@@ -77,10 +78,6 @@ const analysisSchema: Schema = {
       6. Return ONLY the code.
       `,
     },
-    svg_flowchart: {
-      type: Type.STRING,
-      description: "Leave empty or return null, we are using mermaid_code now.",
-    }
   },
   required: [
     "core_emotions",
@@ -103,13 +100,11 @@ const cleanJsonString = (str: string): string => {
   return cleaned;
 };
 
-// Updated signature to accept apiKey as a second argument (matching App.tsx)
 export const analyzeEmotionalMap = async (
-  input: UserInput,
-  providedApiKey?: string
+  input: UserInput
 ): Promise<EmotionalMapAnalysis> => {
-  // Use the provided key, or fallback to the Vite environment variable
-  const apiKey = providedApiKey || import.meta.env.VITE_GEMINI_API_KEY;
+  // Use the API key provided in the input, fallback to env if not present (dev mode)
+  const apiKey = input.apiKey || process.env.API_KEY;
   
   if (!apiKey) {
     throw new Error("API Key is missing. Please enter your Google Gemini API Key in the settings.");
@@ -125,11 +120,8 @@ export const analyzeEmotionalMap = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash", // Changed to 1.5-flash as 2.5 is not public yet
-      contents: [{
-        role: "user",
-        parts: [{ text: prompt }]
-      }],
+      model: "gemini-2.5-flash",
+      contents: prompt,
       config: {
         responseMimeType: "application/json",
         responseSchema: analysisSchema,
@@ -137,21 +129,15 @@ export const analyzeEmotionalMap = async (
       },
     });
 
-    const text = response.text(); // In new SDK, text() is a method, not a property
+    const text = response.text;
     if (!text) {
       throw new Error("No response generated.");
     }
 
     try {
-      // Clean and parse the response
-      const parsed = JSON.parse(text) as EmotionalMapAnalysis;
-      // Ensure svg_flowchart is at least an empty string if missing to satisfy types
-      if (!parsed.svg_flowchart) parsed.svg_flowchart = ""; 
-      return parsed;
+      return JSON.parse(text) as EmotionalMapAnalysis;
     } catch {
-      const parsed = JSON.parse(cleanJsonString(text)) as EmotionalMapAnalysis;
-      if (!parsed.svg_flowchart) parsed.svg_flowchart = "";
-      return parsed;
+      return JSON.parse(cleanJsonString(text)) as EmotionalMapAnalysis;
     }
   } catch (error: any) {
     console.error("Gemini API Error:", error);
