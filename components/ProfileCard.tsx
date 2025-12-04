@@ -104,7 +104,7 @@ const ProfileCard: React.FC = () => {
                 <div className="flex justify-between items-end -mt-12 mb-3">
                   <div className="w-24 h-24 rounded-full border-[4px] border-surface overflow-hidden shadow-md bg-white group">
                     <img
-                        src="https://pourushsiddharth.in/me.jpg"
+                        src="https://github.com/pourushsiddharth/portfolio/blob/main/voter%20id%20(1).jpg?raw=true"
                         alt="Profile"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
