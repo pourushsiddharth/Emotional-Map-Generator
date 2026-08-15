@@ -2,7 +2,6 @@
 
 An AI-powered web application that analyzes personal situations to generate deep emotional insights, psychological interpretations, and visual emotional flowcharts using Google's Gemini API.
 
-![Emotional Map Generator Banner](https://i.ibb.co/Y4skPYJX/Gemini-Generated-Image-vohvy2vohvy2vohv.png)
 
 ## 🚀 Overview
 
